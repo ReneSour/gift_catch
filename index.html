@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atrapa los regalos correctos</title>
+    <style>
+        :root {
+            --bg-color-top: #001f3f;
+            --bg-color-bottom: #003366;
+            --text-color: #ffffff;
+            --accent-color: #ffcc00;
+            --danger-color: #ff4136;
+            --success-color: #2ecc40;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(to bottom, var(--bg-color-top), var(--bg-color-bottom));
+            font-family: var(--font-family);
+            color: var(--text-color);
+            position: relative;
+        }
+
+        /* Background Elements */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle infinite alternate;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.3; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        .snow {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 10px;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh); }
+        }
+
+        .trees {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 20 L5 10 L10 20 L15 5 L20 20 L25 12 L30 20 L35 8 L40 20 L45 15 L50 20 L55 5 L60 20 L65 12 L70 20 L75 8 L80 20 L85 15 L90 20 L95 5 L100 20 Z" fill="%23001122" opacity="0.5"/></svg>');
+            background-size: 200% 100%;
+            z-index: 2;
+        }
+
+        /* Game Area */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        #player {
+            position: absolute;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            font-size: 50px;
+            text-align: center;
+            line-height: 60px;
+            z-index: 20;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            font-size: 40px;
+            text-align: center;
+            line-height: 50px;
+            z-index: 15;
+        }
+
+        /* UI Layers */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+            text-align: left;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .icon-sample {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #ff4136, #85144b);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 65, 54, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 10px rgba(255, 65, 54, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid white;
+            margin-top: 10px;
+            box-shadow: none;
+        }
+
+        /* HUD */
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 50;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        /* Mobile Controls Hints */
+        .touch-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            display: none; /* Only show if needed or just rely on intuition */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .instructions-grid { padding: 15px; gap: 10px; }
+            .icon-sample { font-size: 1.5rem; }
+            p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Effects -->
+    <div id="stars-container"></div>
+    <div class="trees"></div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <div id="player">🎅</div>
+        <div id="items-container"></div>
+        
+        <!-- HUD -->
+        <div id="hud" class="hidden">
+            <div id="score-display">Puntaje: 0</div>
+            <div id="best-score-display">Récord: 0</div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="overlay">
+            <h1>Atrapa los regalos correctos</h1>
+            <div class="instructions-grid">
+                <div class="icon-sample">🎁</div>
+                <div>
+                    <strong>Regalo CORRECTO</strong><br>
+                    Atrápalo para sumar puntos.
+                </div>
+                <div class="icon-sample">🪨 💣 👺</div>
+                <div>
+                    <strong>Regalos INCORRECTOS</strong><br>
+                    Si atrapas uno, el juego termina.
+                </div>
+            </div>
+            <p>Usa las flechas o toca los lados de la pantalla para moverte.</p>
+            <button class="btn" id="start-btn">Comenzar</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="overlay hidden">
+            <h1>Fin del juego</h1>
+            <p id="final-score">Puntaje obtenido: 0</p>
+            <p id="final-best-score">Récord personal: 0</p>
+            <p style="color: #ffcc00; font-size: 0.9rem; margin-top: 20px;">
+                📸 ¡Toma un screenshot de esta pantalla y comparte tu récord!
+            </p>
+            <button class="btn" id="retry-btn">Reintentar</button>
+            <button class="btn btn-secondary" id="home-btn">Volver al inicio</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Game Logic
+         */
+        const Game = {
+            state: 'start', // start, playing, gameover
+            score: 0,
+            bestScore: 0,
+            width: 0,
+            height: 0,
+            playerX: 0,
+            playerSpeed: 0,
+            basePlayerSpeed: 7, // Desktop speed
+            mobilePlayerSpeed: 6, // Mobile speed
+            items: [],
+            lastTime: 0,
+            spawnTimer: 0,
+            spawnInterval: 1500, // Initial spawn interval ms
+            difficultyTimer: 0,
+            speedMultiplier: 1,
+            
+            // Configuration
+            playerWidth: 60,
+            playerHeight: 60,
+            itemSize: 50,
+            
+            // DOM Elements
+            container: document.getElementById('game-container'),
+            player: document.getElementById('player'),
+            itemsContainer: document.getElementById('items-container'),
+            scoreEl: document.getElementById('score-display'),
+            bestScoreEl: document.getElementById('best-score-display'),
+            startScreen: document.getElementById('start-screen'),
+            gameOverScreen: document.getElementById('game-over-screen'),
+            finalScoreEl: document.getElementById('final-score'),
+            finalBestScoreEl: document.getElementById('final-best-score'),
+            
+            // Input State
+            keys: { ArrowLeft: false, ArrowRight: false },
+            touchInput: 0, // -1 left, 0 none, 1 right
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                // Load Best Score
+                const savedScore = localStorage.getItem('christmasCatchBestScore');
+                if (savedScore) this.bestScore = parseInt(savedScore, 10);
+                this.updateHUD();
+
+                // Inputs
+                this.setupInputs();
+
+                // Background Effects
+                this.createStars();
+                this.createSnow();
+
+                // Buttons
+                document.getElementById('start-btn').addEventListener('click', () => this.startGame());
+                document.getElementById('retry-btn').addEventListener('click', () => this.startGame());
+                document.getElementById('home-btn').addEventListener('click', () => this.showHome());
+            },
+
+            resize() {
+                const rect = this.container.getBoundingClientRect();
+                this.width = rect.width;
+                this.height = rect.height;
+                // Keep player in bounds if resized
+                if (this.playerX > this.width - this.playerWidth) {
+                    this.playerX = this.width - this.playerWidth;
+                    this.updatePlayerPos();
+                }
+            },
+
+            setupInputs() {
+                // Keyboard
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.keys.ArrowLeft = true;
+                    if (e.key === 'ArrowRight') this.keys.ArrowRight = true;
+                });
+                window.addEventListener('keyup', (e) => {
+                    if (e.key === 'ArrowLeft') this.keys.ArrowLeft = false;
+                    if (e.key === 'ArrowRight') this.keys.ArrowRight = false;
+                });
+
+                // Touch
+                const handleTouch = (e) => {
+                    e.preventDefault(); // Prevent scrolling
+                    const touch = e.touches[0];
+                    if (!touch) {
+                        this.touchInput = 0;
+                        return;
+                    }
+                    const rect = this.container.getBoundingClientRect();
+                    const touchX = touch.clientX - rect.left;
+                    
+                    if (touchX < this.width / 2) {
+                        this.touchInput = -1;
+                    } else {
+                        this.touchInput = 1;
+                    }
+                };
+
+                this.container.addEventListener('touchstart', handleTouch, { passive: false });
+                this.container.addEventListener('touchmove', handleTouch, { passive: false });
+                this.container.addEventListener('touchend', () => { this.touchInput = 0; });
+            },
+
+            createStars() {
+                const starsContainer = document.getElementById('stars-container');
+                for (let i = 0; i < 50; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.top = Math.random() * 100 + 'vh';
+                    const size = Math.random() * 3 + 1;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                    star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    star.style.animationDelay = Math.random() * 2 + 's';
+                    starsContainer.appendChild(star);
+                }
+            },
+
+            createSnow() {
+                // Simple snow effect using multiple elements
+                const count = 20;
+                for(let i=0; i<count; i++) {
+                    const flake = document.createElement('div');
+                    flake.className = 'snow';
+                    flake.textContent = '❄';
+                    flake.style.left = Math.random() * 100 + 'vw';
+                    flake.style.opacity = Math.random();
+                    flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                    flake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                    flake.style.animationDelay = (Math.random() * 5) + 's';
+                    document.body.appendChild(flake);
+                }
+            },
+
+            showHome() {
+                this.state = 'start';
+                this.startScreen.classList.remove('hidden');
+                this.gameOverScreen.classList.add('hidden');
+                document.getElementById('hud').classList.add('hidden');
+                this.clearItems();
+            },
+
+            startGame() {
+                this.state = 'playing';
+                this.score = 0;
+                this.speedMultiplier = 1;
+                this.spawnInterval = 1200;
+                this.spawnTimer = 0;
+                this.difficultyTimer = 0;
+                this.items = [];
+                this.clearItems();
+                
+                this.playerX = (this.width - this.playerWidth) / 2;
+                this.updatePlayerPos();
+                
+                this.startScreen.classList.add('hidden');
+                this.gameOverScreen.classList.add('hidden');
+                document.getElementById('hud').classList.remove('hidden');
+                this.updateHUD();
+
+                this.lastTime = performance.now();
+                requestAnimationFrame((t) => this.loop(t));
+            },
+
+            clearItems() {
+                this.itemsContainer.innerHTML = '';
+            },
+
+            spawnItem() {
+                const typeRoll = Math.random();
+                // 40% chance of correct gift, 60% bad
+                const isCorrect = typeRoll > 0.6; 
+                
+                let typeChar, typeClass;
+                if (isCorrect) {
+                    typeChar = '🎁';
+                    typeClass = 'correct';
+                } else {
+                    const badItems = ['🪨', '💣', '👺'];
+                    typeChar = badItems[Math.floor(Math.random() * badItems.length)];
+                    typeClass = 'incorrect';
+                }
+
+                const el = document.createElement('div');
+                el.classList.add('item');
+                el.textContent = typeChar;
+                
+                // Random X position
+                const maxX = this.width - this.itemSize;
+                const x = Math.random() * maxX;
+                const y = -this.itemSize;
+
+                // Speed varies slightly
+                const baseSpeed = 200 * this.speedMultiplier; // pixels per second
+                const speed = baseSpeed + Math.random() * 50;
+
+                const item = {
+                    el,
+                    x,
+                    y,
+                    speed,
+                    isCorrect,
+                    width: this.itemSize,
+                    height: this.itemSize
+                };
+
+                this.itemsContainer.appendChild(el);
+                this.items.push(item);
+            },
+
+            update(dt) {
+                // 1. Difficulty Ramp
+                this.difficultyTimer += dt;
+                if (this.difficultyTimer > 5000) { // Every 5 seconds get harder
+                    this.speedMultiplier += 0.05;
+                    this.spawnInterval = Math.max(400, this.spawnInterval - 50);
+                    this.difficultyTimer = 0;
+                }
+
+                // 2. Player Movement
+                let moveDir = 0;
+                if (this.keys.ArrowLeft || this.touchInput === -1) moveDir = -1;
+                if (this.keys.ArrowRight || this.touchInput === 1) moveDir = 1;
+
+                if (moveDir !== 0) {
+                    const speed = (this.width < 600 ? this.mobilePlayerSpeed : this.basePlayerSpeed) * (dt / 16);
+                    this.playerX += moveDir * speed;
+                    
+                    // Clamp
+                    if (this.playerX < 0) this.playerX = 0;
+                    if (this.playerX > this.width - this.playerWidth) this.playerX = this.width - this.playerWidth;
+                    
+                    this.updatePlayerPos();
+                }
+
+                // 3. Spawning
+                this.spawnTimer += dt;
+                if (this.spawnTimer > this.spawnInterval) {
+                    this.spawnItem();
+                    this.spawnTimer = 0;
+                }
+
+                // 4. Update Items
+                for (let i = this.items.length - 1; i >= 0; i--) {
+                    const item = this.items[i];
+                    item.y += item.speed * (dt / 1000);
+                    
+                    // Render item
+                    item.el.style.transform = `translate(${item.x}px, ${item.y}px)`;
+
+                    // Collision Detection
+                    if (this.checkCollision(this.playerX, this.playerWidth, item)) {
+                        if (item.isCorrect) {
+                            // Score!
+                            this.score++;
+                            this.updateHUD();
+                            this.removeItem(i);
+                            // Visual feedback?
+                        } else {
+                            // Game Over
+                            this.gameOver();
+                            return;
+                        }
+                    } else if (item.y > this.height) {
+                        // Missed item
+                        this.removeItem(i);
+                    }
+                }
+            },
+
+            checkCollision(px, pw, item) {
+                // Simple AABB
+                // Player Y is fixed at bottom: 20px from bottom.
+                // Player height 60px.
+                const py = this.height - 20 - this.playerHeight; 
+                
+                // Hitbox shrinking for better feel
+                const padding = 10; 
+                
+                return (
+                    item.x < px + pw - padding &&
+                    item.x + item.width > px + padding &&
+                    item.y + item.height > py + padding &&
+                    item.y < py + this.playerHeight - padding
+                );
+            },
+
+            removeItem(index) {
+                const item = this.items[index];
+                if (item.el.parentNode) {
+                    item.el.parentNode.removeChild(item.el);
+                }
+                this.items.splice(index, 1);
+            },
+
+            updatePlayerPos() {
+                this.player.style.transform = `translateX(${this.playerX}px)`;
+                // Flip santa if moving left/right? Optional.
+            },
+
+            updateHUD() {
+                this.scoreEl.textContent = `Puntaje: ${this.score}`;
+                this.bestScoreEl.textContent = `Récord: ${this.bestScore}`;
+            },
+
+            gameOver() {
+                this.state = 'gameover';
+                
+                // Update Best Score
+                if (this.score > this.bestScore) {
+                    this.bestScore = this.score;
+                    localStorage.setItem('christmasCatchBestScore', this.bestScore);
+                }
+
+                this.finalScoreEl.textContent = `Puntaje obtenido: ${this.score}`;
+                this.finalBestScoreEl.textContent = `Récord personal: ${this.bestScore}`;
+                
+                this.gameOverScreen.classList.remove('hidden');
+            },
+
+            loop(timestamp) {
+                if (this.state !== 'playing') return;
+
+                const dt = timestamp - this.lastTime;
+                this.lastTime = timestamp;
+
+                this.update(dt);
+
+                requestAnimationFrame((t) => this.loop(t));
+            }
+        };
+
+        // Initialize on load
+        window.onload = () => Game.init();
+
+    </script>
+</body>
+</html>
