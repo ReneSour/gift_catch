@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -28,7 +29,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: linear-gradient(to bottom, var(--bg-color-top), var(--bg-color-bottom));
+            background: #000;
             font-family: var(--font-family);
             color: var(--text-color);
             position: relative;
@@ -44,8 +45,15 @@
         }
 
         @keyframes twinkle {
-            from { opacity: 0.3; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1.2); }
+            from {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
         .snow {
@@ -59,18 +67,9 @@
         }
 
         @keyframes fall {
-            to { transform: translateY(110vh); }
-        }
-
-        .trees {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 20 L5 10 L10 20 L15 5 L20 20 L25 12 L30 20 L35 8 L40 20 L45 15 L50 20 L55 5 L60 20 L65 12 L70 20 L75 8 L80 20 L85 15 L90 20 L95 5 L100 20 Z" fill="%23001122" opacity="0.5"/></svg>');
-            background-size: 200% 100%;
-            z-index: 2;
+            to {
+                transform: translateY(110vh);
+            }
         }
 
         /* Game Area */
@@ -82,29 +81,53 @@
             margin: 0 auto;
             overflow: hidden;
             z-index: 10;
+            border-left: 5px solid #fff;
+            border-right: 5px solid #fff;
+            border-image: repeating-linear-gradient(45deg, #ff0000, #ff0000 10px, #ffffff 10px, #ffffff 20px) 1;
+
+            /* New Background Image */
+            background-image: url('images/papa_noel.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Darken overlay for better visibility */
+        #game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            /* Semi-transparent dark overlay */
+            z-index: 0;
         }
 
         #player {
             position: absolute;
             bottom: 20px;
-            width: 60px;
-            height: 60px;
-            font-size: 50px;
-            text-align: center;
-            line-height: 60px;
+            width: 80px;
+            height: 80px;
             z-index: 20;
             transition: transform 0.1s;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            font-size: 70px;
+            text-align: center;
+            line-height: 80px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
         }
 
         .item {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            font-size: 40px;
-            text-align: center;
-            line-height: 50px;
+            width: 60px;
+            /* Slightly larger for images */
+            height: 60px;
             z-index: 15;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
         }
 
         /* UI Layers */
@@ -114,15 +137,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            padding: 20px;
+            padding: 40px;
             text-align: center;
             backdrop-filter: blur(5px);
+
+            /* Festive Pine Garland Border */
+            border: 25px solid transparent;
+            border-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Pine Background --%3E%3Crect width='60' height='60' fill='none'/%3E%3C!-- Pine Branches --%3E%3Cpath d='M0 30 Q15 10 30 30 Q45 50 60 30' stroke='%23228B22' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3Cpath d='M0 30 Q15 50 30 30 Q45 10 60 30' stroke='%23006400' stroke-width='10' fill='none' stroke-linecap='round'/%3E%3C!-- Ornaments --%3E%3Ccircle cx='15' cy='20' r='5' fill='%23FF0000'/%3E%3Ccircle cx='45' cy='40' r='5' fill='%23FFD700'/%3E%3Ccircle cx='30' cy='30' r='4' fill='%23FF0000'/%3E%3C/svg%3E") 25 round;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
         }
 
         .hidden {
@@ -130,10 +158,12 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            color: #ff0000;
+            text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+            font-family: 'Georgia', serif;
+            letter-spacing: 1px;
         }
 
         h2 {
@@ -156,18 +186,26 @@
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
+            border: 2px solid #2ecc40;
         }
 
         .icon-sample {
-            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .icon-sample img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
         }
 
         .btn {
-            background: linear-gradient(to bottom, #ff4136, #85144b);
-            border: none;
+            background: linear-gradient(to bottom, #ff0000, #cc0000);
+            border: 2px solid #fff;
             border-radius: 50px;
             padding: 15px 40px;
             color: white;
@@ -175,13 +213,15 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(255, 65, 54, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
             transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 10px rgba(255, 65, 54, 0.3);
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
         }
 
         .btn-secondary {
@@ -203,41 +243,38 @@
             font-size: 1.2rem;
             font-weight: bold;
             z-index: 50;
-            text-shadow: 1px 1px 2px black;
-        }
-
-        /* Mobile Controls Hints */
-        .touch-hint {
-            position: absolute;
-            bottom: 20px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            pointer-events: none;
-            display: none; /* Only show if needed or just rely on intuition */
+            text-shadow: 2px 2px 2px #000;
+            color: #ffcc00;
         }
 
         /* Responsive adjustments */
         @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .instructions-grid { padding: 15px; gap: 10px; }
-            .icon-sample { font-size: 1.5rem; }
-            p { font-size: 1rem; }
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .instructions-grid {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            p {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Background Effects -->
     <div id="stars-container"></div>
-    <div class="trees"></div>
 
     <!-- Game Container -->
     <div id="game-container">
         <div id="player">🎅</div>
         <div id="items-container"></div>
-        
+
         <!-- HUD -->
         <div id="hud" class="hidden">
             <div id="score-display">Puntaje: 0</div>
@@ -246,30 +283,38 @@
 
         <!-- Start Screen -->
         <div id="start-screen" class="overlay">
-            <h1>Atrapa los regalos correctos</h1>
+            <h1>🎄 Atrapa los regalos 🎄</h1>
             <div class="instructions-grid">
-                <div class="icon-sample">🎁</div>
-                <div>
-                    <strong>Regalo CORRECTO</strong><br>
-                    Atrápalo para sumar puntos.
+                <div class="icon-sample">
+                    <img src="images/coca_cola.png" alt="Coca Cola">
+                    <img src="images/pavo.png" alt="Pavo">
+                    <img src="images/inca_kola.png" alt="Inca Kola">
                 </div>
-                <div class="icon-sample">🪨 💣 👺</div>
+                <div>
+                    <strong>Regalos CORRECTOS</strong><br>
+                    <span style="color: #2ecc40;">¡Atrápalos!</span> (Coca-Cola, Pavito, Inca Kola)
+                </div>
+                <div class="icon-sample">
+                    <img src="images/grinch.png" alt="Grinch">
+                    <img src="images/kola_real.png" alt="KR">
+                    <img src="images/pepsi.png" alt="Pepsi">
+                </div>
                 <div>
                     <strong>Regalos INCORRECTOS</strong><br>
-                    Si atrapas uno, el juego termina.
+                    <span style="color: #ff4136;">¡Evítalos!</span> (Grinch, KR, Pepsi)
                 </div>
             </div>
-            <p>Usa las flechas o toca los lados de la pantalla para moverte.</p>
-            <button class="btn" id="start-btn">Comenzar</button>
+            <p>Ayuda a Santa a recolectar la cena navideña.</p>
+            <button class="btn" id="start-btn">🎅 Comenzar</button>
         </div>
 
         <!-- Game Over Screen -->
         <div id="game-over-screen" class="overlay hidden">
-            <h1>Fin del juego</h1>
+            <h1>🎅 Fin del juego 🎅</h1>
             <p id="final-score">Puntaje obtenido: 0</p>
             <p id="final-best-score">Récord personal: 0</p>
             <p style="color: #ffcc00; font-size: 0.9rem; margin-top: 20px;">
-                📸 ¡Toma un screenshot de esta pantalla y comparte tu récord!
+                📸 ¡Toma un screenshot y comparte tu espíritu navideño!
             </p>
             <button class="btn" id="retry-btn">Reintentar</button>
             <button class="btn btn-secondary" id="home-btn">Volver al inicio</button>
@@ -296,12 +341,12 @@
             spawnInterval: 1500, // Initial spawn interval ms
             difficultyTimer: 0,
             speedMultiplier: 1,
-            
+
             // Configuration
-            playerWidth: 60,
-            playerHeight: 60,
-            itemSize: 50,
-            
+            playerWidth: 80,
+            playerHeight: 80,
+            itemSize: 60,
+
             // DOM Elements
             container: document.getElementById('game-container'),
             player: document.getElementById('player'),
@@ -312,7 +357,7 @@
             gameOverScreen: document.getElementById('game-over-screen'),
             finalScoreEl: document.getElementById('final-score'),
             finalBestScoreEl: document.getElementById('final-best-score'),
-            
+
             // Input State
             keys: { ArrowLeft: false, ArrowRight: false },
             touchInput: 0, // -1 left, 0 none, 1 right
@@ -320,7 +365,7 @@
             init() {
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
-                
+
                 // Load Best Score
                 const savedScore = localStorage.getItem('christmasCatchBestScore');
                 if (savedScore) this.bestScore = parseInt(savedScore, 10);
@@ -371,7 +416,7 @@
                     }
                     const rect = this.container.getBoundingClientRect();
                     const touchX = touch.clientX - rect.left;
-                    
+
                     if (touchX < this.width / 2) {
                         this.touchInput = -1;
                     } else {
@@ -403,7 +448,7 @@
             createSnow() {
                 // Simple snow effect using multiple elements
                 const count = 20;
-                for(let i=0; i<count; i++) {
+                for (let i = 0; i < count; i++) {
                     const flake = document.createElement('div');
                     flake.className = 'snow';
                     flake.textContent = '❄';
@@ -433,10 +478,10 @@
                 this.difficultyTimer = 0;
                 this.items = [];
                 this.clearItems();
-                
+
                 this.playerX = (this.width - this.playerWidth) / 2;
                 this.updatePlayerPos();
-                
+
                 this.startScreen.classList.add('hidden');
                 this.gameOverScreen.classList.add('hidden');
                 document.getElementById('hud').classList.remove('hidden');
@@ -453,22 +498,23 @@
             spawnItem() {
                 const typeRoll = Math.random();
                 // 40% chance of correct gift, 60% bad
-                const isCorrect = typeRoll > 0.6; 
-                
-                let typeChar, typeClass;
+                const isCorrect = typeRoll > 0.6;
+
+                let imageUrl;
                 if (isCorrect) {
-                    typeChar = '🎁';
-                    typeClass = 'correct';
+                    // Correct: Coke, Turkey, Inca Kola
+                    const correctItems = ['images/coca_cola.png', 'images/pavo.png', 'images/inca_kola.png'];
+                    imageUrl = correctItems[Math.floor(Math.random() * correctItems.length)];
                 } else {
-                    const badItems = ['🪨', '💣', '👺'];
-                    typeChar = badItems[Math.floor(Math.random() * badItems.length)];
-                    typeClass = 'incorrect';
+                    // Incorrect: Grinch, Kola Real, Pepsi
+                    const badItems = ['images/grinch.png', 'images/kola_real.png', 'images/pepsi.png'];
+                    imageUrl = badItems[Math.floor(Math.random() * badItems.length)];
                 }
 
                 const el = document.createElement('div');
                 el.classList.add('item');
-                el.textContent = typeChar;
-                
+                el.style.backgroundImage = `url('${imageUrl}')`;
+
                 // Random X position
                 const maxX = this.width - this.itemSize;
                 const x = Math.random() * maxX;
@@ -509,11 +555,11 @@
                 if (moveDir !== 0) {
                     const speed = (this.width < 600 ? this.mobilePlayerSpeed : this.basePlayerSpeed) * (dt / 16);
                     this.playerX += moveDir * speed;
-                    
+
                     // Clamp
                     if (this.playerX < 0) this.playerX = 0;
                     if (this.playerX > this.width - this.playerWidth) this.playerX = this.width - this.playerWidth;
-                    
+
                     this.updatePlayerPos();
                 }
 
@@ -528,7 +574,7 @@
                 for (let i = this.items.length - 1; i >= 0; i--) {
                     const item = this.items[i];
                     item.y += item.speed * (dt / 1000);
-                    
+
                     // Render item
                     item.el.style.transform = `translate(${item.x}px, ${item.y}px)`;
 
@@ -539,7 +585,6 @@
                             this.score++;
                             this.updateHUD();
                             this.removeItem(i);
-                            // Visual feedback?
                         } else {
                             // Game Over
                             this.gameOver();
@@ -555,12 +600,11 @@
             checkCollision(px, pw, item) {
                 // Simple AABB
                 // Player Y is fixed at bottom: 20px from bottom.
-                // Player height 60px.
-                const py = this.height - 20 - this.playerHeight; 
-                
+                const py = this.height - 20 - this.playerHeight;
+
                 // Hitbox shrinking for better feel
-                const padding = 10; 
-                
+                const padding = 10;
+
                 return (
                     item.x < px + pw - padding &&
                     item.x + item.width > px + padding &&
@@ -579,7 +623,6 @@
 
             updatePlayerPos() {
                 this.player.style.transform = `translateX(${this.playerX}px)`;
-                // Flip santa if moving left/right? Optional.
             },
 
             updateHUD() {
@@ -589,7 +632,7 @@
 
             gameOver() {
                 this.state = 'gameover';
-                
+
                 // Update Best Score
                 if (this.score > this.bestScore) {
                     this.bestScore = this.score;
@@ -598,7 +641,7 @@
 
                 this.finalScoreEl.textContent = `Puntaje obtenido: ${this.score}`;
                 this.finalBestScoreEl.textContent = `Récord personal: ${this.bestScore}`;
-                
+
                 this.gameOverScreen.classList.remove('hidden');
             },
 
@@ -619,4 +662,5 @@
 
     </script>
 </body>
+
 </html>
