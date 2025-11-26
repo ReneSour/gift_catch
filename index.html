@@ -186,7 +186,11 @@
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
-            border: 2px solid #2ecc40;
+
+            /* Festive Christmas Branch Border */
+            border: 15px solid transparent;
+            border-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Holly leaves --%3E%3Cpath d='M10 40 Q20 25 30 35 Q35 40 30 45 Q20 55 10 40 Z' fill='%23228B22'/%3E%3Cpath d='M50 40 Q60 25 70 35 Q75 40 70 45 Q60 55 50 40 Z' fill='%23006400'/%3E%3C!-- Pine needles --%3E%3Cpath d='M40 10 L42 30 L38 30 Z' fill='%23228B22'/%3E%3Cpath d='M40 50 L42 70 L38 70 Z' fill='%23228B22'/%3E%3C!-- Berries --%3E%3Ccircle cx='25' cy='40' r='4' fill='%23DC143C'/%3E%3Ccircle cx='65' cy='40' r='4' fill='%23DC143C'/%3E%3Ccircle cx='40' cy='25' r='3' fill='%23DC143C'/%3E%3Ccircle cx='40' cy='65' r='3' fill='%23DC143C'/%3E%3C!-- Gold accents --%3E%3Ccircle cx='18' cy='35' r='2' fill='%23FFD700'/%3E%3Ccircle cx='62' cy='45' r='2' fill='%23FFD700'/%3E%3C/svg%3E") 15 round;
+            box-shadow: 0 0 15px rgba(46, 204, 64, 0.3);
         }
 
         .icon-sample {
@@ -292,7 +296,8 @@
                 </div>
                 <div>
                     <strong>Regalos CORRECTOS</strong><br>
-                    <span style="color: #2ecc40;">¡Atrápalos!</span> (Coca-Cola, Pavito, Inca Kola)
+                    <span style="color: #2ecc40;">¡Atrápalos!</span> (Coca-Cola, Pavito, Inca Kola)<br>
+                    <small style="color: #ffcc00;">¡Si dejas caer uno, pierdes!</small>
                 </div>
                 <div class="icon-sample">
                     <img src="images/grinch.png" alt="Grinch">
@@ -539,11 +544,11 @@
             },
 
             update(dt) {
-                // 1. Difficulty Ramp
+                // 1. Difficulty Ramp (Balanced for skill-based gameplay)
                 this.difficultyTimer += dt;
-                if (this.difficultyTimer > 5000) { // Every 5 seconds get harder
-                    this.speedMultiplier += 0.05;
-                    this.spawnInterval = Math.max(400, this.spawnInterval - 50);
+                if (this.difficultyTimer > 4000) { // Every 4 seconds get harder
+                    this.speedMultiplier += 0.07; // Gradual speed increase
+                    this.spawnInterval = Math.max(400, this.spawnInterval - 60); // Controlled spawn rate
                     this.difficultyTimer = 0;
                 }
 
@@ -592,6 +597,10 @@
                         }
                     } else if (item.y > this.height) {
                         // Missed item
+                        if (item.isCorrect) {
+                            this.gameOver(); // Game Over if correct item is missed
+                            return;
+                        }
                         this.removeItem(i);
                     }
                 }
