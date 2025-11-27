@@ -348,8 +348,7 @@
             <p style="color: #ffcc00; font-size: 0.9rem; margin-top: 20px;">
                 📸 ¡Toma un screenshot y comparte tu espíritu navideño!
             </p>
-            <button class="btn" id="retry-btn">Reintentar</button>
-            <button class="btn btn-secondary" id="home-btn">Volver al inicio</button>
+            <button class="btn" id="retry-btn">Intentar de nuevo</button>
         </div>
     </div>
 
@@ -421,9 +420,17 @@
                     }
                 });
 
-                // Game over buttons
-                document.getElementById('retry-btn').addEventListener('click', () => this.startGame());
-                document.getElementById('home-btn').addEventListener('click', () => this.showHome());
+                // Game over button
+                const retryBtn = document.getElementById('retry-btn');
+                retryBtn.addEventListener('click', () => {
+                    if (this.state === 'gameover') this.startGame();
+                });
+                retryBtn.addEventListener('touchstart', (e) => {
+                    if (this.state === 'gameover') {
+                        e.preventDefault();
+                        this.startGame();
+                    }
+                }, { passive: false });
             },
 
             resize() {
