@@ -81,6 +81,20 @@
             }
         }
 
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
         /* Game Area */
         #game-container {
             position: relative;
@@ -320,7 +334,10 @@
                     <span style="color: #ff4136;">¡Evítalos!</span> (Grinch, KR, Pepsi)
                 </div>
             </div>
-            <button class="btn" id="start-btn" style="margin-top: 10px;">🎅 Comenzar</button>
+            <p
+                style="color: #ffcc00; font-size: 1.3rem; margin-top: 20px; font-weight: bold; animation: pulse 2s ease-in-out infinite;">
+                👆 Toca para comenzar 👆
+            </p>
         </div>
 
         <!-- Game Over Screen -->
@@ -393,8 +410,18 @@
                 this.createStars();
                 this.createSnow();
 
-                // Buttons
-                document.getElementById('start-btn').addEventListener('click', () => this.startGame());
+                // Start screen - tap anywhere to start
+                this.startScreen.addEventListener('click', () => {
+                    if (this.state === 'start') this.startGame();
+                });
+                this.startScreen.addEventListener('touchstart', (e) => {
+                    if (this.state === 'start') {
+                        e.preventDefault();
+                        this.startGame();
+                    }
+                });
+
+                // Game over buttons
                 document.getElementById('retry-btn').addEventListener('click', () => this.startGame());
                 document.getElementById('home-btn').addEventListener('click', () => this.showHome());
             },
